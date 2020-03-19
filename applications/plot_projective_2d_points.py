@@ -1,7 +1,7 @@
 from matplotlib import pyplot
 import numpy
 
-from ..visualize import line_endpoints_2d_plot
+from projective_geometry.visualize import line_endpoints_2d_plot
 
 if __name__ == '__main__':
     x1 = numpy.array([1,3,1])
