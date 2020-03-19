@@ -1,7 +1,7 @@
 from matplotlib import pyplot
 import numpy
 
-from ..visualize import line_endpoints_2d_plot
+from projective_geometry.visualize import line_endpoints_2d_plot
 
 if __name__ == '__main__':
     x1 = numpy.array([1,3,1])
@@ -31,7 +31,6 @@ if __name__ == '__main__':
     blue_line_y = [intercept1[1], intercept2[1]]
 
     ax.plot(blue_line_x, blue_line_y, 'b-')
-    # print(dir(ax))
     ax.set_xlim((x_min, x_max))
     ax.set_ylim((y_min, y_max))
 
