@@ -36,7 +36,7 @@ def point_list_to_lines(point_list):
     return numpy.array(lines)
 
 
-def execute(image_filename):
+def execute(image_filename, is_bgr):
     """Affinely rectify an input image with manual annotation
 
     This file will read an image, present that image to the user and wait for
@@ -47,12 +47,16 @@ def execute(image_filename):
         image_filename: a filename of an image
     """
     im = cv2.imread(image_filename)
+    if is_bgr:
+        im = im[:,:,::-1]
 
     f = pyplot.figure()
     ax = f.add_subplot(111)
     ax.imshow(im)
     ax.set_title('Please click 4 corners of a planar surface in clockwise order.')
     corners = pyplot.ginput(4)
+
+    pyplot.close(f)
 
     # first get the four lines that these points create
     homogeneous_points = numpy.array([
@@ -67,12 +71,21 @@ def execute(image_filename):
     x_max = im.shape[1]
     y_max = im.shape[0]
 
-    plottable_lines = [
-        projective_geometry.visualize.line_endpoints_2d_plot(
-            hline, [x_min, x_max, y_min, y_max]
-        )
-        for hline in homogeneous_lines
-    ]
+    f = pyplot.figure()
+    ax = f.add_subplot(111)
+    ax.imshow(im)
+    ax.set_title('Corners of plane and vanishing lines')
+
+    for hline in homogeneous_lines:
+        x1, x2 = projective_geometry.visualize.line_endpoints_2d_plot(
+            hline, [x_min, x_max, y_min, y_max])
+        ax.plot([x1[0], x2[0]],
+                [x1[1], x2[1]],
+                'y-')
+
+    ax.plot(homogeneous_points[0,:],
+            homogeneous_points[1,:],
+            'r+')
 
     # get images of the two vanishing points
     vp1 = numpy.cross(homogeneous_lines[0,:], homogeneous_lines[2,:])
@@ -138,9 +151,14 @@ def main():
                         action='store',
                         help='The filename of the image to load.')
 
+    parser.add_argument('--bgr',
+                        action='store_true',
+                        default=False,
+                        help='Is the image BGR instead of RGB?')
+
     args = parser.parse_args()
 
-    execute(args.image_filename)
+    execute(args.image_filename, args.bgr)
 
 
 if __name__ == "__main__":
